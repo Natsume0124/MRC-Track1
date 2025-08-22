@@ -74,7 +74,7 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         }
     """
     output = {}
-    if phase_codename == "VQA-SA":
+    if phase_codename == "VG-RS":
         print("Evaluating for VG-RS Phase")
         with open(test_annotation_file, 'r', encoding='utf-8') as f:
             test_data = json.load(f)
