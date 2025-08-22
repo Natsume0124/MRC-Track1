@@ -1,6 +1,40 @@
-import random
+import os
+import json
 
+def compute_iou(box1, box2):
+    """
+    计算两个边界框的IOU（Intersection over Union）
+    :param box1: 第一个边界框 [[x1, y1], [x2, y2]]
+    :param box2: 第二个边界框 [[x1, y1], [x2, y2]]
+    :return: IOU值
+    """
+    # 标准化边界框坐标（确保左上角和右下角）
+    x1s = [min(p[0] for p in box1), min(p[0] for p in box2)]
+    x2s = [max(p[0] for p in box1), max(p[0] for p in box2)]
+    y1s = [min(p[1] for p in box1), min(p[1] for p in box2)]
+    y2s = [max(p[1] for p in box1), max(p[1] for p in box2)]
 
+    # 获取交集坐标
+    inter_x1 = max(x1s[0], x1s[1])
+    inter_y1 = max(y1s[0], y1s[1])
+    inter_x2 = min(x2s[0], x2s[1])
+    inter_y2 = min(y2s[0], y2s[1])
+
+    # 计算交集面积
+    inter_width = max(0, inter_x2 - inter_x1)
+    inter_height = max(0, inter_y2 - inter_y1)
+    inter_area = inter_width * inter_height
+
+    # 计算各自面积
+    area1 = (x2s[0] - x1s[0]) * (y2s[0] - y1s[0])
+    area2 = (x2s[1] - x1s[1]) * (y2s[1] - y1s[1])
+
+    # 计算并集面积
+    union_area = area1 + area2 - inter_area
+
+    # 计算IOU
+    return inter_area / union_area if union_area > 0 else 0.0, area1
+    
 def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwargs):
     print("Starting Evaluation.....")
     """
@@ -40,42 +74,87 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         }
     """
     output = {}
-    if phase_codename == "dev":
-        print("Evaluating for Dev Phase")
+    if phase_codename == "VQA-SA":
+        print("Evaluating for VG-RS Phase")
+        with open(test_annotation_file, 'r', encoding='utf-8') as f:
+            test_data = json.load(f)
+        with open(user_submission_file, 'r', encoding='utf-8') as f:
+            user_data = json.load(f)
+            # 构建用户提交数据的查找字典
+        user_dict = {(item['image_path'], item['question']): item for item in user_data}
+        # 存储结果
+        results = []
+        accum_acc_05 = 0
+        accum_acc_06 = 0
+        accum_acc_07 = 0
+        accum_acc_08 = 0
+        accum_acc_09 = 0
+        accum_acc_s = 0
+        accum_acc_s_total = 0
+        accum_acc_m = 0
+        accum_acc_m_total = 0
+        accum_acc_l = 0
+        accum_acc_l_total = 0
+        i=0
+        # 遍历测试数据
+        for item in test_data:
+            key = (item['image_path'], item['question'])
+            if key in user_dict:
+                # 获取两个result并计算IOU
+                box1 = item['result']
+                box2 = user_dict[key]['result']
+                iou, label_area = compute_iou(box1, box2)
+                results.append(iou)
+                i += 1
+                if iou >= 0.5:
+                    accum_acc_05 += 1
+                if iou >= 0.6:
+                    accum_acc_06 += 1
+                if iou >= 0.7:
+                    accum_acc_07 += 1
+                if iou >= 0.8:
+                    accum_acc_08 += 1
+                if iou >= 0.9:
+                    accum_acc_09 += 1
+    
+                if label_area < 96*96:
+                    accum_acc_s_total += 1
+                    if iou >= 0.5:
+                        accum_acc_s += 1
+    
+                if 192*192 > label_area > 96*96:
+                    accum_acc_m_total += 1
+                    if iou >= 0.5:
+                        accum_acc_m += 1
+    
+                if label_area > 192*192:
+                    accum_acc_l_total += 1
+                    if iou >= 0.5:
+                        accum_acc_l += 1
+                        
+        accum_acc_05 = accum_acc_05 / len(test_data)
+        accum_acc_06 = accum_acc_06 / len(test_data)
+        accum_acc_07 = accum_acc_07 / len(test_data)
+        accum_acc_08 = accum_acc_08 / len(test_data)
+        accum_acc_09 = accum_acc_09 / len(test_data)
+        accum_acc_s = accum_acc_s / accum_acc_s_total
+        accum_acc_m = accum_acc_m / accum_acc_m_total
+        accum_acc_l = accum_acc_l / accum_acc_l_total
         output["result"] = [
             {
-                "train_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
+                "test_split": {
+                    "ACC@0.5": accum_acc_05,
+                    "ACC@0.6": accum_acc_06,
+                    "ACC@0.7": accum_acc_07,
+                    "ACC@0.8": accum_acc_08,
+                    "ACC@0.9": accum_acc_09,
+                    "ACC@small": accum_acc_s,
+                    "ACC@medium": accum_acc_m,
+                    "ACC@large": accum_acc_l,
                 }
             }
         ]
         # To display the results in the result file
-        output["submission_result"] = output["result"][0]["train_split"]
-        print("Completed evaluation for Dev Phase")
-    elif phase_codename == "test":
-        print("Evaluating for Test Phase")
-        output["result"] = [
-            {
-                "train_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
-                }
-            },
-            {
-                "test_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
-                }
-            },
-        ]
-        # To display the results in the result file
         output["submission_result"] = output["result"][0]
-        print("Completed evaluation for Test Phase")
+        print("Completed evaluation for VG-RS Phase")
     return output
