@@ -1,1 +1,40 @@
-<p>Submit any blank file here to see a random number generated for your submission. If you get lucky, you might reach the top of the leaderboard.</p>
+    <p>This guide applies to all participants of the following tracks:<br>
+    - Track 1: Visual Grounding in Real-world Scenarios (VG-RS)<br>
+
+    <h3>Track-Specific Requirements</h3>
+    
+    <!-- Track 1 -->
+    <h4>Track 1: Visual Grounding (VG-RS)</h4>
+    <ul>
+        <li><strong>Model Submission</strong>: Submit multimodal reasoning models with PyTorch/TensorFlow compatibility for bounding box prediction tasks.</li>
+        <li><strong>Documentation</strong>: Include technical documentation explaining scene perception mechanisms and spatial reasoning implementation. Must annotate data preprocessing workflows <a href="https://lens4mllms.github.io/mars2-workshop-iccv2025/">[[WorkShop]]</a>.</li> 
+        <li><strong>Result Format</strong>: JSON file with structure:
+            <pre><code>[{
+  "image_path": "images\\*.jpg",
+  "question": "Target description",
+  "result": [[x1,y1],[x2,y2]]  // Top-left/bottom-right coordinates
+}]</code></pre>
+        </li>
+<!--         <li><strong>Visualization</strong>: Provide annotated visualizations (PNG format) covering at least 10 test scenarios with ground-truth bounding boxes.</li> -->
+    </ul>
+
+    <h3>Evaluation Criteria</h3>
+    <table border="1">
+        <tr><th>Track</th><th>Core Metrics</th></tr>
+        <tr><td>VG-RS</td><td>Bounding Box Accuracy (ACC)</td></tr>
+    </table>
+
+<h3>Submission Specifications</h3>
+<ul>
+    <li><strong>Initial Competition Phase</strong>: 
+        <ul>
+            <li>Submit <strong>uncompressed JSON files</strong> only (no .zip/.tar.gz required during competition)</li>
+            <li>Result Format: Must strictly follow the specified JSON schema for each track</li>
+        </ul>
+    </li>
+    <p>Please select the <span style="color: red;">"Public"</span> option under submission visibility.</p>
+
+</ul>
+
+    <h3>Ethics Statement</h3>
+    <p>All submissions must comply with ethical standards. Data usage must follow the <a href="https://lens4mllms.github.io/mars2-workshop-iccv2025/">data  license agreement</a>. No sensitive information or training data leakage allowed.</p>
