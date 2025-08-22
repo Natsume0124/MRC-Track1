@@ -5,7 +5,7 @@ short_description: MRC-Track 1
 description: templates/description.html
 evaluation_details: templates/evaluation_details.html
 terms_and_conditions: templates/terms_and_conditions.html
-image: logo.jpg
+image: logo1.png
 submission_guidelines: templates/submission_guidelines.html
 leaderboard_description: For different tracks, please refer to the evaluation tab for their selected metrics.
 evaluation_script: evaluation_script.zip
@@ -22,13 +22,31 @@ leaderboard:
   - id: 1
     schema:
       {
-        "labels": ["Metric1", "Metric2", "Metric3", "Total"],
-        "default_order_by": "Total",
+        "labels": ["ACC@0.5", "ACC@0.6 ", "ACC@0.7", "ACC@0.8", "ACC@0.9", "ACC@small", "ACC@medium", "ACC@large"],
+        "default_order_by": "ACC@0.5",
         "metadata": {
-          "Metric1": {
+          "ACC@0.5": {
             "sort_ascending": False,
           },
-          "Metric2": {
+          "ACC@0.6": {
+            "sort_ascending": False,
+          },
+          "ACC@0.7": {
+            "sort_ascending": False,
+          },
+          "ACC@0.8": {
+            "sort_ascending": False,
+          },
+          "ACC@0.9": {
+            "sort_ascending": False,
+          },
+          "ACC@small": {
+            "sort_ascending": False,
+          },
+          "ACC@medium": {
+            "sort_ascending": False,
+          },
+          "ACC@large": {
             "sort_ascending": False,
           }
         }
@@ -71,5 +89,6 @@ challenge_phase_splits:
     is_leaderboard_order_descending: True
     show_execution_time: True
     show_leaderboard_by_latest_submission: True
+
 
 
